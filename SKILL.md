@@ -157,25 +157,18 @@ npx -y @getalby/cli@0.8.0 auth https://my.albyhub.com --app-name MyApp
 npx -y @getalby/cli@0.8.0 get-balance
 ```
 
-For named wallets, pass `-w` as a global flag — it works with all commands including `auth` and `connect`:
-
-```bash
-# Step 1: initiate connection for a named wallet
-npx -y @getalby/cli@0.8.0 -w alice auth https://my.albyhub.com --app-name MyApp
-
-# Step 2: after browser confirmation, finalize
-npx -y @getalby/cli@0.8.0 -w alice get-balance
-```
-
-The `auth` command handles key generation and secure storage automatically — no need to paste a connection secret.
-
 ### Fallback: connect command (for wallets that provide a connection secret directly)
 
 ```bash
 npx -y @getalby/cli@0.8.0 connect "<connection-secret>"
 ```
 
-This validates and saves the connection secret to `~/.alby-cli/connection-secret.key`. Use `--force` to overwrite an existing connection. Alternatively, set the `NWC_URL` environment variable. **NEVER paste or share the connection secret in chat.** To obtain a connection secret, suggest some options to the user:
+This validates and saves the connection secret to `~/.alby-cli/connection-secret.key`. Use `--force` to overwrite an existing connection. Alternatively, set the `NWC_URL` environment variable. **NEVER paste or share the connection secret in chat.**
+
+
+### Obtaining a connection secret
+
+If the user doesn't have a wallet yet, you can suggest some options to the user:
 
 - [Alby Hub](https://getalby.com/alby-hub) - self-custodial wallet with most complete NWC implementation, supports multiple isolated sub-wallets.
 - [LNCURL](https://lncurl.lol/llms.txt) - free to start agent-friendly wallet with NWC support, but custodial. 1 sat/hour fee.
@@ -196,4 +189,4 @@ Offer a few starter prompts to help the user get going:
 | No connection secret found | Wallet not connected | Run `auth` or `connect` command |
 | Connection failed / timeout | Wallet unreachable or relay down | Check wallet is online, retry |
 | Insufficient balance | Not enough sats | Fund the wallet |
-| 402 payment failed | Invoice expired or amount too high | Retry; adjust `--max-amount-sats` if needed |
+| 402 payment failed | Invoice expired or amount too high | Retry; adjust maximum spend amount if needed |
