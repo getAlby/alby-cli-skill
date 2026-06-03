@@ -4,7 +4,7 @@ description: teaches agents how to use @getalby/cli for bitcoin lightning wallet
 license: MIT-0
 metadata:
   author: getAlby
-  version: "1.3.0"
+  version: "1.3.1"
   openclaw:
     requires:
       env:
@@ -75,10 +75,13 @@ For the exact arguments and options of any command listed below, run `npx -y @ge
 auth, connect
 
 **Common Wallet operations:**
-pay, receive, get-balance, list-transactions
+- `pay` — send to a lightning address, BOLT-11 invoice, crypto/stablecoin address, or via keysend
+- `receive` — receive via lightning address or BOLT-11 invoice
+- `get-balance` — check wallet balance
+- `list-transactions` — list recent transactions
 
 **Additional Wallet operations:**
-get-info, get-wallet-service-info, get-budget, make-invoice, pay-invoice, pay-keysend, lookup-invoice, sign-message, wait-for-payment, pay-crypto, list-wallets
+get-info, get-wallet-service-info, get-budget, lookup-invoice, sign-message, wait-for-payment, list-wallets
 
 **HTTP 402 Payments:**
 fetch — auto-detects L402, X402, and MPP payment protocols. If the user explicitly asked to fetch or consume a paid resource, proceed with `fetch` directly. If a 402 is encountered unexpectedly (e.g. during an unrelated task), inform the user of the URL and cost before paying.
