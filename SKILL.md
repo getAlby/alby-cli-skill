@@ -1,10 +1,10 @@
 ---
 name: alby-bitcoin-payments
-description: teaches agents how to use @getalby/cli to operate a bitcoin lightning wallet via Nostr Wallet Connect (NIP-47). Use whenever the user wants to send or receive money, pay an invoice or any address, top up a card or account, check wallet balance, create invoices, convert between fiat and sats, retry an HTTP request that returned 402 Payment Required, or discover paid API services. Beyond lightning, it can pay to any on-chain cryptocurrency/stablecoin address (e.g. USDC/USDT) by automatically swapping from the bitcoin balance.
+description: teaches agents how to use @getalby/cli to operate a bitcoin lightning wallet via Nostr Wallet Connect (NIP-47). Use whenever the user wants to send or receive money, pay an invoice, check wallet balance, create invoices, convert between fiat and sats, retry an HTTP request that returned 402 Payment Required, or discover paid API services. Beyond lightning, it can pay to any on-chain cryptocurrency/stablecoin address (e.g. USDC/USDT) by automatically swapping from the bitcoin balance.
 license: MIT-0
 metadata:
   author: getAlby
-  version: "1.3.7"
+  version: "1.3.8"
   openclaw:
     requires:
       env:
