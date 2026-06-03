@@ -4,7 +4,7 @@ description: teaches agents how to use @getalby/cli for bitcoin lightning wallet
 license: MIT-0
 metadata:
   author: getAlby
-  version: "1.3.4"
+  version: "1.3.5"
   openclaw:
     requires:
       env:
@@ -75,7 +75,7 @@ The CLI resolves the connection secret in this order:
 auth, connect
 
 **Common Wallet operations:**
-- `pay` — send to a lightning address, BOLT-11 invoice, crypto/stablecoin address, or via keysend. Supports native fiat conversion.
+- `pay` — send to a lightning address, BOLT-11 invoice, crypto/stablecoin address (0x…), or via keysend. Supports native fiat conversion.
 - `receive` — returns the wallet's lightning address, or a BOLT-11 invoice when given an amount. Supports native fiat conversion.
 - `get-balance` — check wallet balance
 - `list-transactions` — list recent transactions
