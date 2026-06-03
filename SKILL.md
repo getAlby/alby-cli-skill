@@ -4,7 +4,7 @@ description: teaches agents how to use @getalby/cli for bitcoin lightning wallet
 license: MIT-0
 metadata:
   author: getAlby
-  version: "1.3.2"
+  version: "1.3.3"
   openclaw:
     requires:
       env:
@@ -75,8 +75,8 @@ For the exact arguments and options of any command listed below, run `npx -y @ge
 auth, connect
 
 **Common Wallet operations:**
-- `pay` — send to a lightning address, BOLT-11 invoice, crypto/stablecoin address, or via keysend. Supports fiat amounts.
-- `receive` — receive via lightning address or BOLT-11 invoice. Supports fiat amounts.
+- `pay` — send to a lightning address, BOLT-11 invoice, crypto/stablecoin address, or via keysend. Pass fiat amounts directly (e.g. `$5`); never pre-convert with `fiat-to-sats`.
+- `receive` — receive via lightning address or BOLT-11 invoice. Pass fiat amounts directly (e.g. `$5`); never pre-convert with `fiat-to-sats`.
 - `get-balance` — check wallet balance
 - `list-transactions` — list recent transactions
 
@@ -95,9 +95,7 @@ discover
 make-hold-invoice, settle-hold-invoice, cancel-hold-invoice
 
 **Lightning tools (no wallet needed):**
-fiat-to-sats, sats-to-fiat, parse-invoice, verify-preimage, request-invoice-from-lightning-address
-
-- `fiat-to-sats` / `sats-to-fiat` are for standalone conversion only (pay/receive support fiat amounts).
+fiat-to-sats (standalone-use only), sats-to-fiat (standalone-use only), parse-invoice, verify-preimage, request-invoice-from-lightning-address
 
 ## Getting Help
 
