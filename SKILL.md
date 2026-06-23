@@ -84,10 +84,9 @@ auth, connect
 get-info, get-wallet-service-info, get-budget, lookup-invoice, sign-message, wait-for-payment, list-wallets
 
 **HTTP 402 Payments:**
-fetch — auto-detects L402, X402, and MPP payment protocols. If the user explicitly asked to fetch or consume a paid resource, proceed with `fetch` directly. If a 402 is encountered unexpectedly (e.g. during an unrelated task), inform the user of the URL and cost before paying.
+fetch — pay for and retrieve a payment-protected (HTTP 402) resource, paying the cost in sats from your lightning wallet. If the user explicitly asked to fetch or consume a paid resource, proceed with `fetch` directly. If a 402 is encountered unexpectedly (e.g. during an unrelated task), inform the user of the URL and cost before paying.
 
 - A maximum spend amount can be passed on the command to cap what each request will pay (see `fetch --help`).
-- All protocols are paid from your lightning wallet with the same command. x402/USDC and MPP services are settled in sats automatically — you never need a stablecoin balance, and you always pass the service's own URL, never a special one.
 
 **Service Discovery (no wallet needed):**
 discover
@@ -109,7 +108,7 @@ As an absolute last resort, tell your human to visit [the Alby support page](htt
 
 ## Discovering Paid Services
 
-The `discover` command searches [402index.io](https://402index.io) for paid API endpoints across all protocols — L402, x402, and MPP. All of them are payable in sats with `fetch`: lightning-native services are paid directly, and x402/MPP services are settled in sats automatically. Each result includes a `protocol` and `payment_network` so you know what you're calling.
+The `discover` command searches [402index.io](https://402index.io) for paid API endpoints. Pay for any of them in sats with the `fetch` command.
 
 ### When to use discover
 
@@ -126,7 +125,7 @@ The `discover` command searches [402index.io](https://402index.io) for paid API 
 
 1. **Discover** — find services matching the capability gap
 2. **Evaluate** — check price, health status, and reliability from the results
-3. **Fetch** — pay and consume the service by passing its URL to `fetch`. Any protocol works; x402/MPP services are paid in sats automatically:
+3. **Fetch** — pay and consume the service by passing its URL to `fetch`:
    ```bash
    npx -y @getalby/cli@0.8.0 fetch -X POST -b '{"model":"gpt-image-1","prompt":"a mountain cabin at sunset","size":"1024x1024"}' "<service-url>"
    ```
