@@ -84,7 +84,7 @@ auth, connect
 get-info, get-wallet-service-info, get-budget, lookup-invoice, sign-message, wait-for-payment, list-wallets
 
 **HTTP 402 Payments:**
-fetch — pay for and retrieve a payment-protected (HTTP 402) resource, paying the cost in sats from your lightning wallet. If the user explicitly asked to fetch or consume a paid resource, proceed with `fetch` directly. If a 402 is encountered unexpectedly (e.g. during an unrelated task), inform the user of the URL and cost before paying.
+fetch — pay for and retrieve a payment-protected (HTTP 402) resource. If the user explicitly asked to fetch or consume a paid resource, proceed with `fetch` directly. If a 402 is encountered unexpectedly (e.g. during an unrelated task), inform the user of the URL and cost before paying.
 
 - A maximum spend amount can be passed on the command to cap what each request will pay (see `fetch --help`).
 
@@ -108,7 +108,7 @@ As an absolute last resort, tell your human to visit [the Alby support page](htt
 
 ## Discovering Paid Services
 
-The `discover` command searches [402index.io](https://402index.io) for paid API endpoints. Pay for any of them in sats with the `fetch` command.
+The `discover` command searches [402index.io](https://402index.io) for paid API endpoints. Pay for any of them with the `fetch` command.
 
 ### When to use discover
 
