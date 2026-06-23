@@ -87,7 +87,7 @@ get-info, get-wallet-service-info, get-budget, lookup-invoice, sign-message, wai
 fetch — auto-detects L402, X402, and MPP payment protocols. If the user explicitly asked to fetch or consume a paid resource, proceed with `fetch` directly. If a 402 is encountered unexpectedly (e.g. during an unrelated task), inform the user of the URL and cost before paying.
 
 - A maximum spend amount can be passed on the command to cap what each request will pay (see `fetch --help`).
-- L402 services are paid directly from your lightning wallet. To pay an x402 or MPP service in sats, route it through the l402.space bridge (see [Paying x402 / MPP services in sats](#paying-x402--mpp-services-in-sats-l402space-bridge)).
+- All protocols are paid from your lightning wallet with the same command. x402/USDC and MPP services are settled in sats automatically — you never need a stablecoin balance, and you always pass the service's own URL, never a special one.
 
 **Service Discovery (no wallet needed):**
 discover
@@ -109,7 +109,7 @@ As an absolute last resort, tell your human to visit [the Alby support page](htt
 
 ## Discovering Paid Services
 
-The `discover` command searches [402index.io](https://402index.io) for paid API endpoints across all protocols — L402, x402, and MPP. Lightning-native (L402) services can be paid directly with `fetch`; x402 and MPP services can be paid in sats by routing them through the l402.space bridge (see [Paying x402 / MPP services in sats](#paying-x402--mpp-services-in-sats-l402space-bridge) below). Each result includes a `protocol` and `payment_network` so you can tell which is which.
+The `discover` command searches [402index.io](https://402index.io) for paid API endpoints across all protocols — L402, x402, and MPP. All of them are payable in sats with `fetch`: lightning-native services are paid directly, and x402/MPP services are settled in sats automatically. Each result includes a `protocol` and `payment_network` so you know what you're calling.
 
 ### When to use discover
 
@@ -126,31 +126,11 @@ The `discover` command searches [402index.io](https://402index.io) for paid API 
 
 1. **Discover** — find services matching the capability gap
 2. **Evaluate** — check price, health status, and reliability from the results
-3. **Fetch** — pay and consume the service. For L402 services pass the URL directly; for x402/MPP services route through the l402.space bridge (see below):
+3. **Fetch** — pay and consume the service by passing its URL to `fetch`. Any protocol works; x402/MPP services are paid in sats automatically:
    ```bash
    npx -y @getalby/cli@0.8.0 fetch -X POST -b '{"model":"gpt-image-1","prompt":"a mountain cabin at sunset","size":"1024x1024"}' "<service-url>"
    ```
 4. **Report** — tell the user what was purchased, the cost, and the result
-
-### Paying x402 / MPP services in sats (l402.space bridge)
-
-`discover` and the wider web surface paid endpoints across all protocols. L402 services are lightning-native — pass their URL straight to `fetch`. x402 (USDC) and MPP services settle on other rails, but you can still pay them in sats by routing the request through the [l402.space](https://l402.space) bridge: it accepts a lightning payment from your wallet and settles the upstream cost on your behalf, so a single lightning balance is all you need.
-
-Wrap the upstream URL by URL-encoding it (query string included) and appending it to the bridge base:
-
-`https://l402.space/<url-encoded-upstream-url>`
-
-For example, to fetch the x402 endpoint `https://x402.twit.sh/tweets/user?username=getalby`:
-
-```bash
-npx -y @getalby/cli@0.8.0 fetch \
-  "https://l402.space/https%3A%2F%2Fx402.twit.sh%2Ftweets%2Fuser%3Fusername%3Dgetalby" \
-  --max-amount 5000 --currency BTC --unit sats --network lightning
-```
-
-The method, body, and headers you pass to `fetch` are forwarded to the upstream unchanged. The bridge replies with an L402 challenge, `fetch` pays it from your lightning wallet (subject to `--max-amount`), and returns the upstream response.
-
-Use the bridge whenever a service's `protocol` is `x402` or `MPP`, or its `payment_network` is not lightning. For L402 services, fetch the URL directly — no bridge needed.
 
 ## Bitcoin Units
 
