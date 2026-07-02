@@ -121,7 +121,7 @@ Your HTTP method and body pass through unchanged. For full details and current b
 
 ## Discovering Paid Services
 
-The `discover` command searches [402index.io](https://402index.io) for lightning-payable API endpoints. For services on other rails (x402/USDC, MPP), pay them via the bridge described above.
+The `discover` command searches [402index.io](https://402index.io) for paid API endpoints across all supported rails — L402, x402, and MPP. Do not filter by rail unless explicitly told by the human. Lightning-native services can be paid with `fetch` directly; for non-lightning services (x402/USDC, MPP/Tempo), pay them from your lightning wallet via the bridge described above.
 
 ### When to use discover
 
