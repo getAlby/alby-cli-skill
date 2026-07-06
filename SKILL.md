@@ -111,7 +111,7 @@ As an absolute last resort, tell your human to visit [the Alby support page](htt
 
 You are **not** limited to lightning-native services. Endpoints priced in **USDC on Base or Solana** (x402) or **stablecoin on Tempo** (MPP) can be paid from your lightning wallet through a universal bridge at [l402.space](https://l402.space) — you pay the bridge over lightning and it forwards payment to the upstream over its own rail. Rails the bridge does not fund (e.g. Stellar, Polygon, Stripe) can't be paid this way.
 
-`discover` already returns bridgeable services with their `l402.space` URL in place (see below), so you normally just `fetch` the URL from the results. You only need to wrap a URL by hand when you have a non-lightning endpoint from elsewhere: URL-encode the full upstream endpoint (including query params) and append it to `https://l402.space/`, then `fetch` that:
+`discover` already returns every result ready to `fetch` (non-lightning ones are bridged for you, unpayable ones dropped), so you only need to wrap a URL by hand when you have a non-lightning endpoint **from elsewhere**: URL-encode the full upstream endpoint (including query params) and append it to `https://l402.space/`, then `fetch` that:
 
 ```bash
 npx -y @getalby/cli@0.9.0 fetch "https://l402.space/<url-encoded-upstream-url>" --max-amount <amount> --currency BTC --unit sats --network lightning
@@ -121,7 +121,7 @@ Your HTTP method and body pass through unchanged. For full details and current b
 
 ## Discovering Paid Services
 
-The `discover` command searches [402index.io](https://402index.io) for paid API endpoints across all supported rails — L402, x402, and MPP. Do not filter by rail unless explicitly told by the human. Results are returned ready to pay: lightning-native services (L402, or anything on the Lightning rail) keep their own URL, and services on a bridge-funded rail (USDC on Base/Solana, stablecoin on Tempo) come back with their `l402.space` URL already set. Either way, just pass the result's `url` to `fetch`. Services on rails the bridge can't settle (e.g. Stellar, Polygon, Stripe) are returned with their native URL and aren't payable from a lightning wallet.
+The `discover` command searches [402index.io](https://402index.io) for paid API endpoints across L402, x402, and MPP. Every result is payable in sats — just pass its `url` to `fetch`. Do not filter by rail unless explicitly told by the human.
 
 ### When to use discover
 
