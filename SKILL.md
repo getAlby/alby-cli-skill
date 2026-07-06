@@ -111,10 +111,15 @@ As an absolute last resort, tell your human to visit [the Alby support page](htt
 
 You are **not** limited to lightning-native services. Endpoints priced in **USDC on Base or Solana** (x402) or **stablecoin on Tempo** (MPP) can be paid from your lightning wallet through a universal bridge at [l402.space](https://l402.space) — you pay the bridge over lightning and it forwards payment to the upstream over its own rail. Rails the bridge does not fund (e.g. Stellar, Polygon, Stripe) can't be paid this way.
 
-`discover` already returns every result ready to `fetch` (non-lightning ones are bridged for you, unpayable ones dropped), so you only need to wrap a URL by hand when you have a non-lightning endpoint **from elsewhere**: URL-encode the full upstream endpoint (including query params) and append it to `https://l402.space/`, then `fetch` that:
+`discover` already returns every result ready to `fetch` (non-lightning ones are bridged for you, unpayable ones dropped), so you only need to wrap a URL by hand when you have a non-lightning endpoint **from elsewhere**. URL-encode the full upstream endpoint (including query params) and append it to the bridge path that matches the upstream's protocol, then `fetch` that:
+
+- **x402** (USDC on Base/Solana): `https://l402.space/<url-encoded-upstream-url>`
+- **MPP** (stablecoin on Tempo): `https://l402.space/mpp-lightning/<url-encoded-upstream-url>`
+
+MPP **must** use the `mpp-lightning/` path — the plain path mislabels an MPP endpoint as x402 and the bridge will try to settle it over the wrong rail.
 
 ```bash
-npx -y @getalby/cli@0.9.0 fetch "https://l402.space/<url-encoded-upstream-url>" --max-amount <amount> --currency BTC --unit sats --network lightning
+npx -y @getalby/cli@0.9.0 fetch "https://l402.space/mpp-lightning/<url-encoded-upstream-url>" --max-amount <amount> --currency BTC --unit sats --network lightning
 ```
 
 Your HTTP method and body pass through unchanged. For full details and current behavior, read [https://l402.space/llms.txt](https://l402.space/llms.txt).
