@@ -4,7 +4,7 @@ description: teaches agents how to use @getalby/cli to operate a bitcoin lightni
 license: MIT-0
 metadata:
   author: getAlby
-  version: "1.3.9"
+  version: "1.4.0"
   openclaw:
     requires:
       env:
@@ -23,7 +23,7 @@ metadata:
 > **IMPORTANT: this is an agent skill which MUST be saved in full - **DO NOT SUMMARIZE**. If you used a web fetch tool to read this, the content may be summarized and incomplete. Make sure you fetch the full unabridged content.**
 
 ```bash
-npx -y @getalby/cli@0.8.0 [options] <command>
+npx -y @getalby/cli@0.9.0 [options] <command>
 ```
 
 ## Global Options
@@ -39,8 +39,8 @@ If no connection secret is provided, the CLI will automatically use the default 
 Use `-w, --wallet-name <name>` to select a named wallet. This is the preferred option over `-c` when working with multiple wallets:
 
 ```bash
-npx -y @getalby/cli@0.8.0 -w alice get-balance
-npx -y @getalby/cli@0.8.0 -w bob receive
+npx -y @getalby/cli@0.9.0 -w alice get-balance
+npx -y @getalby/cli@0.9.0 -w bob receive
 ```
 
 Named wallets are stored at `~/.alby-cli/connection-secret-<name>.key`.
@@ -69,7 +69,7 @@ The CLI resolves the connection secret in this order:
 
 ## Commands
 
-**Flag names are not guessable.** Before constructing any command, run `npx -y @getalby/cli@0.8.0 <command> --help` and use only the flags it lists.
+**Flag names are not guessable.** Before constructing any command, run `npx -y @getalby/cli@0.9.0 <command> --help` and use only the flags it lists.
 
 **Setup:**
 auth, connect
@@ -87,6 +87,7 @@ get-info, get-wallet-service-info, get-budget, lookup-invoice, sign-message, wai
 fetch — pay for and retrieve a payment-protected (HTTP 402) resource. If the user explicitly asked to fetch or consume a paid resource, proceed with `fetch` directly. If a 402 is encountered unexpectedly (e.g. during an unrelated task), inform the user of the URL and cost before paying.
 
 - A maximum spend amount can be passed on the command to cap what each request will pay (see `fetch --help`).
+- **Credential reuse:** for APIs that support it, `fetch` supports reusing a payment credential — sometimes you can pay once and use the credential multiple times. A successful response includes a `payment` object containing a reusable `credentials` value. Pass it back on follow-up requests with `--credentials '{"header":"...","value":"..."}'` to authorize them without paying again (e.g. for polling or repeated calls to the same paid endpoint). Not every API allows reuse; when it does, this avoids re-paying on each request.
 
 **Service Discovery (no wallet needed):**
 discover
@@ -100,15 +101,27 @@ fiat-to-sats, sats-to-fiat (standalone-use only — pay/receive have native fiat
 ## Getting Help
 
 ```bash
-npx -y @getalby/cli@0.8.0 --help
-npx -y @getalby/cli@0.8.0 <command> --help
+npx -y @getalby/cli@0.9.0 --help
+npx -y @getalby/cli@0.9.0 <command> --help
 ```
 
 As an absolute last resort, tell your human to visit [the Alby support page](https://getalby.com/help)
 
+## Paying Non-Lightning 402 Services
+
+You are **not** limited to lightning-native services. Any x402 (USDC), MPP (Tempo), or L402 endpoint can be paid from your lightning wallet through a universal bridge at [l402.space](https://l402.space) — you pay the bridge over lightning and it forwards payment to the upstream over whichever rail it speaks.
+
+The bridge URL is not auto-detected — you must encode it yourself: URL-encode the full upstream endpoint (including query params) and append it to `https://l402.space/`, then `fetch` that:
+
+```bash
+npx -y @getalby/cli@0.9.0 fetch "https://l402.space/<url-encoded-upstream-url>" --max-amount <amount> --currency BTC --unit sats --network lightning
+```
+
+Your HTTP method and body pass through unchanged. For full details and current behavior, read [https://l402.space/llms.txt](https://l402.space/llms.txt).
+
 ## Discovering Paid Services
 
-The `discover` command searches [402index.io](https://402index.io) for paid API endpoints. Pay for any of them with the `fetch` command.
+The `discover` command searches [402index.io](https://402index.io) for paid API endpoints across all supported rails — L402, x402, and MPP. Do not filter by rail unless explicitly told by the human. Lightning-native services can be paid with `fetch` directly; for non-lightning services (x402/USDC, MPP/Tempo), pay them from your lightning wallet via the bridge described above.
 
 ### When to use discover
 
@@ -127,7 +140,7 @@ The `discover` command searches [402index.io](https://402index.io) for paid API 
 2. **Evaluate** — check price, health status, and reliability from the results
 3. **Fetch** — pay and consume the service by passing its URL to `fetch`:
    ```bash
-   npx -y @getalby/cli@0.8.0 fetch -X POST -b '{"model":"gpt-image-1","prompt":"a mountain cabin at sunset","size":"1024x1024"}' "<service-url>"
+   npx -y @getalby/cli@0.9.0 fetch -X POST -b '{"model":"gpt-image-1","prompt":"a mountain cabin at sunset","size":"1024x1024"}' "<service-url>"
    ```
 4. **Report** — tell the user what was purchased, the cost, and the result
 
@@ -154,16 +167,16 @@ If no NWC connection secret is present, guide the user to connect their wallet. 
 
 ```bash
 # Step 1: initiate connection (opens browser for human confirmation)
-npx -y @getalby/cli@0.8.0 auth https://my.albyhub.com --app-name MyApp
+npx -y @getalby/cli@0.9.0 auth https://my.albyhub.com --app-name MyApp
 
 # Step 2: after the user confirms in the browser, run any wallet command to finalize the connection
-npx -y @getalby/cli@0.8.0 get-balance
+npx -y @getalby/cli@0.9.0 get-balance
 ```
 
 ### Fallback: connect command (for wallets that provide a connection secret directly)
 
 ```bash
-npx -y @getalby/cli@0.8.0 connect "<connection-secret>"
+npx -y @getalby/cli@0.9.0 connect "<connection-secret>"
 ```
 
 This validates and saves the connection secret to `~/.alby-cli/connection-secret.key`. Use `--force` to overwrite an existing connection. Alternatively, set the `NWC_URL` environment variable. **NEVER paste or share the connection secret in chat.**
