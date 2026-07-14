@@ -137,7 +137,7 @@ The `discover` command searches [402index.io](https://402index.io) for paid API 
 ### Discover → Fetch flow
 
 1. **Discover** — find services matching the capability gap
-2. **Evaluate** — check health status and reliability from the results. Price (`price_sats`/`price_usd`) is often `null` — many services don't publish one up front, so you may not learn the cost until the `402` challenge at fetch time. Use `--max-amount` to cap the spend when the price is unknown.
+2. **Evaluate** — check health status and reliability from the results. Treat listed prices as hints only: they can be missing or outdated. The real price is set by the `402` challenge at fetch time, and `fetch` refuses to pay more than its `--max-amount` cap (default: 5000 sats).
 3. **Fetch** — pay and consume the service by passing its URL to `fetch`:
    ```bash
    npx -y @getalby/cli@0.9.0 fetch -X POST -b '{"model":"gpt-image-1","prompt":"a mountain cabin at sunset","size":"1024x1024"}' "<service-url>"
