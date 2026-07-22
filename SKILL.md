@@ -84,7 +84,7 @@ auth, connect
 get-info, get-wallet-service-info, get-budget, lookup-invoice, sign-message, wait-for-payment, list-wallets
 
 **HTTP 402 Payments:**
-fetch — auto-detects L402, X402, and MPP payment protocols and pays any of them from the lightning wallet. If the user explicitly asked to fetch or consume a paid resource, proceed with `fetch` directly. If a 402 is encountered unexpectedly (e.g. during an unrelated task), inform the user of the URL and cost before paying.
+fetch — pay for and retrieve a payment-protected (HTTP 402) resource — auto-detects L402, X402, and MPP. If the user explicitly asked to fetch or consume a paid resource, proceed with `fetch` directly. If a 402 is encountered unexpectedly (e.g. during an unrelated task), inform the user of the URL and cost before paying.
 
 - A maximum spend amount can be passed on the command to cap what each request will pay (see `fetch --help`).
 - **Credential reuse:** for APIs that support it, `fetch` supports reusing a payment credential — sometimes you can pay once and use the credential multiple times. A successful response includes a `payment` object containing a reusable `credentials` value. Pass it back on follow-up requests with `--credentials '{"header":"...","value":"..."}'` to authorize them without paying again (e.g. for polling or repeated calls to the same paid endpoint). Not every API allows reuse; when it does, this avoids re-paying on each request.
@@ -122,7 +122,7 @@ Your HTTP method and body pass through unchanged. For full details and current b
 
 ## Discovering Paid Services
 
-The `discover` command searches [402index.io](https://402index.io) for paid API endpoints across all supported rails — L402, x402, and MPP. Every result is payable in sats — just pass its URL to `fetch`. Do not filter by rail unless explicitly told by the human.
+The `discover` command searches [402index.io](https://402index.io) for paid API endpoints across L402, x402, and MPP. Every result is payable in sats — just pass its `url` to `fetch`. Do not filter by rail unless explicitly told by the human.
 
 ### When to use discover
 
@@ -138,8 +138,8 @@ The `discover` command searches [402index.io](https://402index.io) for paid API 
 ### Discover → Fetch flow
 
 1. **Discover** — find services matching the capability gap
-2. **Evaluate** — check price, health status, and reliability from the results (health checks can be stale — a "degraded" service may work fine, so don't exclude a good match on health status alone)
-3. **Fetch** — pay and consume the service:
+2. **Evaluate** — check health status and reliability from the results (health checks can be stale — a "degraded" service may work fine, so don't exclude a good match on health status alone). Treat listed prices as hints only: they can be missing or outdated. The real price is set by the `402` challenge at fetch time, and `fetch` refuses to pay more than its `--max-amount` cap (default: 5000 sats).
+3. **Fetch** — pay and consume the service by passing its URL to `fetch`:
    ```bash
    npx -y @getalby/cli@0.10.0 fetch -X POST -b '{"model":"gpt-image-1","prompt":"a mountain cabin at sunset","size":"1024x1024"}' "<service-url>"
    ```
