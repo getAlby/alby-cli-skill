@@ -1,10 +1,10 @@
 ---
 name: alby-bitcoin-payments
-description: teaches agents how to use @getalby/cli to operate a bitcoin lightning wallet via Nostr Wallet Connect (NIP-47). Use whenever the user wants to send or receive money, pay an invoice, check wallet balance, create invoices, convert between fiat and sats, retry an HTTP request that returned 402 Payment Required, or discover paid API services. Beyond lightning, it can pay to any on-chain cryptocurrency/stablecoin address (e.g. USDC/USDT) by automatically swapping from the bitcoin balance.
+description: teaches agents how to use @getalby/cli to operate a bitcoin lightning wallet via Nostr Wallet Connect (NIP-47). Use whenever the user wants to send or receive money, pay an invoice, check wallet balance, create invoices, convert between fiat and sats, retry an HTTP request that returned 402 Payment Required, or discover paid API services. Pays HTTP 402 resources across all major payment protocols - L402, x402, and MPP - from the lightning wallet. Beyond lightning, it can pay to any on-chain cryptocurrency/stablecoin address (e.g. USDC/USDT) by automatically swapping from the bitcoin balance.
 license: MIT-0
 metadata:
   author: getAlby
-  version: "1.4.0"
+  version: "1.4.1"
   openclaw:
     requires:
       env:
@@ -84,7 +84,7 @@ auth, connect
 get-info, get-wallet-service-info, get-budget, lookup-invoice, sign-message, wait-for-payment, list-wallets
 
 **HTTP 402 Payments:**
-fetch — auto-detects L402, X402, and MPP payment protocols. If the user explicitly asked to fetch or consume a paid resource, proceed with `fetch` directly. If a 402 is encountered unexpectedly (e.g. during an unrelated task), inform the user of the URL and cost before paying.
+fetch — pay for and retrieve a payment-protected (HTTP 402) resource. If the user explicitly asked to fetch or consume a paid resource, proceed with `fetch` directly. If a 402 is encountered unexpectedly (e.g. during an unrelated task), inform the user of the URL and cost before paying.
 
 - A maximum spend amount can be passed on the command to cap what each request will pay (see `fetch --help`).
 - **Credential reuse:** for APIs that support it, `fetch` supports reusing a payment credential — sometimes you can pay once and use the credential multiple times. A successful response includes a `payment` object containing a reusable `credentials` value. Pass it back on follow-up requests with `--credentials '{"header":"...","value":"..."}'` to authorize them without paying again (e.g. for polling or repeated calls to the same paid endpoint). Not every API allows reuse; when it does, this avoids re-paying on each request.
@@ -109,9 +109,9 @@ As an absolute last resort, tell your human to visit [the Alby support page](htt
 
 ## Paying Non-Lightning 402 Services
 
-You are **not** limited to lightning-native services. Any x402 (USDC), MPP (Tempo), or L402 endpoint can be paid from your lightning wallet through a universal bridge at [l402.space](https://l402.space) — you pay the bridge over lightning and it forwards payment to the upstream over whichever rail it speaks.
+You are **not** limited to lightning-native services. Endpoints priced in **USDC on Base or Solana** (x402) or **stablecoin on Tempo** (MPP) can be paid from your lightning wallet through a universal bridge at [l402.space](https://l402.space) — you pay the bridge over lightning and it forwards payment to the upstream over its own rail. Rails the bridge does not fund (e.g. Stellar, Polygon, Stripe) can't be paid this way.
 
-The bridge URL is not auto-detected — you must encode it yourself: URL-encode the full upstream endpoint (including query params) and append it to `https://l402.space/`, then `fetch` that:
+`discover` already returns every result ready to `fetch` (non-lightning ones are bridged for you, unpayable ones dropped), so you only need to wrap a URL by hand when you have a non-lightning endpoint **from elsewhere**: URL-encode the full upstream endpoint (including query params) and append it to `https://l402.space/`, then `fetch` that. The same path works for x402 and MPP upstreams alike — the gateway detects the upstream's protocol itself. An x402/MPP endpoint that supports lightning natively needs no bridge at all; just `fetch` it directly.
 
 ```bash
 npx -y @getalby/cli@0.9.0 fetch "https://l402.space/<url-encoded-upstream-url>" --max-amount <amount> --currency BTC --unit sats --network lightning
@@ -121,7 +121,7 @@ Your HTTP method and body pass through unchanged. For full details and current b
 
 ## Discovering Paid Services
 
-The `discover` command searches [402index.io](https://402index.io) for paid API endpoints across all supported rails — L402, x402, and MPP. Do not filter by rail unless explicitly told by the human. Lightning-native services can be paid with `fetch` directly; for non-lightning services (x402/USDC, MPP/Tempo), pay them from your lightning wallet via the bridge described above.
+The `discover` command searches [402index.io](https://402index.io) for paid API endpoints across L402, x402, and MPP. Every result is payable in sats — just pass its `url` to `fetch`. Do not filter by rail unless explicitly told by the human.
 
 ### When to use discover
 
@@ -137,8 +137,8 @@ The `discover` command searches [402index.io](https://402index.io) for paid API 
 ### Discover → Fetch flow
 
 1. **Discover** — find services matching the capability gap
-2. **Evaluate** — check price, health status, and reliability from the results
-3. **Fetch** — pay and consume the service:
+2. **Evaluate** — check health status and reliability from the results. Treat listed prices as hints only: they can be missing or outdated. The real price is set by the `402` challenge at fetch time, and `fetch` refuses to pay more than its `--max-amount` cap (default: 5000 sats).
+3. **Fetch** — pay and consume the service by passing its URL to `fetch`:
    ```bash
    npx -y @getalby/cli@0.9.0 fetch -X POST -b '{"model":"gpt-image-1","prompt":"a mountain cabin at sunset","size":"1024x1024"}' "<service-url>"
    ```
